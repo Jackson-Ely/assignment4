@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #ffffff;
+}
+
+.header {
+    background-color: #4a90d9;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-bottom: 2px solid #357abd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 18px;
+    margin: 0;
+}
+
+.header a {
+    color: #ffffff;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.header a:hover {
+    text-decoration: underline;
+}
+
+.page {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    height: calc(100vh - 46px);
+}
+
+.sidebar {
+    background-color: #f0f0f0;
+    border-right: 1px solid #cccccc;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    padding: 14px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+}
+
+.panel h2 {
+    font-size: 14px;
+    margin: 0 0 12px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.panel label {
+    font-size: 12px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.panel input[type="text"],
+.panel input[type="number"],
+.panel select {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    padding: 6px 8px;
+    border: 1px solid #cccccc;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.panel button {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    background-color: #4a90d9;
+    color: #ffffff;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.panel button:hover {
+    background-color: #357abd;
+}
+
+.status-msg {
+    font-size: 12px;
+    text-align: center;
+    margin-top: 8px;
+    min-height: 16px;
+}
+
+.success { color: #2a7a2a; }
+.error   { color: #cc3333; }
+
+.content {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.content h2 {
+    font-size: 16px;
+    margin: 0 0 14px 0;
+}
+
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+}
+
+.book-card {
+    border: 1px solid #cccccc;
+    padding: 12px;
+    background-color: #fafafa;
+    box-sizing: border-box;
+}
+
+.book-card:hover {
+    border-color: #4a90d9;
+}
+
+.book-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.book-author {
+    font-size: 13px;
+    color: #555555;
+    margin-bottom: 4px;
+}
+
+.book-year {
+    font-size: 12px;
+    color: #777777;
+    margin-bottom: 2px;
+}
+
+.book-published {
+    font-size: 12px;
+    color: #777777;
+    margin-bottom: 2px;
+}
+
+.book-added-by {
+    font-size: 11px;
+    color: #999999;
+    margin-bottom: 6px;
+}
+
+.book-id {
+    font-family: monospace;
+    font-size: 11px;
+    color: #999999;
+    word-break: break-all;
+    border-top: 1px solid #eeeeee;
+    padding-top: 6px;
+    margin-top: 6px;
+}
+
+.empty-state {
+    color: #999999;
+    font-size: 14px;
+    padding: 30px;
+    text-align: center;
+    grid-column: 1 / -1;
+}
+</style>
+<title>Book Collection</title>
+</head>
+<body>
+
+<div class="header">
+    <h1> Book Collection Admin</h1>
+    <a href="/logout">Log Out</a>
+</div>
+
+<div class="page">
+    <div class="sidebar">
+
+        <div class="panel">
+            <h2>Add Book</h2>
+            <label for="title">Title</label>
+            <input type="text" id="title" placeholder="Book title">
+
+            <label for="author">Author</label>
+            <input type="text" id="author" placeholder="Author name">
+
+            <label for="year">Year</label>
+            <input type="number" id="year" placeholder="e.g. 1984">
+
+            <button id="addBtn">Add Book</button>
+            <p class="status-msg" id="message"></p>
+        </div>
+
+        <div class="panel">
+            <h2>Update Book</h2>
+            <label for="updateId">Book _id</label>
+            <input type="text" id="updateId" placeholder="Paste _id from card">
+
+            <label for="updateTitle">New Title</label>
+            <input type="text" id="updateTitle" placeholder="Leave blank to keep">
+
+            <label for="updateYear">New Year</label>
+            <input type="number" id="updateYear" placeholder="Leave blank to keep">
+
+            <label for="updatePublished">Published</label>
+            <select id="updatePublished">
+                <option value="">— No change —</option>
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+
+            <button id="updateBtn">Update Book</button>
+            <p class="status-msg" id="updateMessage"></p>
+        </div>
+
+        <div class="panel">
+            <h2>Delete Book</h2>
+            <label for="deleteId">Book _id</label>
+            <input type="text" id="deleteId" placeholder="Paste _id from card">
+
+            <button id="deleteBtn">Delete Book</button>
+            <p class="status-msg" id="deleteMessage"></p>
+        </div>
+
+    </div>
+
+    <div class="content">
+        <h2>All Books</h2>
+        <div class="books-grid" id="books">
+            <p class="empty-state">Loading books...</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function setMsg(id, text, type) {
+        var el = document.getElementById(id);
+        el.textContent = text;
+        el.className = 'status-msg ' + (type || '');
+    }
+
+    function renderBooks(books) {
+        var container = document.getElementById('books');
+
+        if (!books || books.length === 0) {
+            container.innerHTML = '<p class="empty-state">No books found.</p>';
+            return;
+        }
+
+        var html = '';
+        for (var i = 0; i < books.length; i++) {
+            var book = books[i];
+            html += '<div class="book-card">';
+            html += '<div class="book-title">' + book.title + '</div>';
+            html += '<div class="book-author">' + book.author + '</div>';
+            html += '<div class="book-year">Year: ' + (book.year || '—') + '</div>';
+            html += '<div class="book-published">Published: ' + book.published + '</div>';
+            if (book.addedBy) {
+                html += '<div class="book-added-by">Added by: ' + book.addedBy + '</div>';
+            }
+            html += '<div class="book-id">_id: ' + book._id + '</div>';
+            html += '</div>';
+        }
+        container.innerHTML = html;
+    }
+
+    function fetchBooks() {
+        fetch('/api')
+        .then(function(res) {
+            if (res.status === 401) { window.location.href = '/login'; return null; }
+            return res.json();
+        })
+        .then(function(books) {
+            if (books) renderBooks(books);
+        })
+        .catch(function() {
+            document.getElementById('books').innerHTML = '<p class="empty-state">Error fetching books.</p>';
+        });
+    }
+
+    fetchBooks();
+
+    document.getElementById('addBtn').addEventListener('click', function() {
+        var title = document.getElementById('title').value;
+        var author = document.getElementById('author').value;
+        var year = document.getElementById('year').value;
+
+        if (!title || !author) {
+            setMsg('message', 'Title and Author are required.', 'error');
+            return;
+        }
+
+        fetch('/api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: title, author: author, year: year ? Number(year) : null })
+        })
+        .then(function(res) {
+            if (res.status === 401) { window.location.href = '/login'; return null; }
+            return res.json();
+        })
+        .then(function(data) {
+            if (!data) return;
+            setMsg('message', 'Book added!', 'success');
+            document.getElementById('title').value = '';
+            document.getElementById('author').value = '';
+            document.getElementById('year').value = '';
+            fetchBooks();
+        })
+        .catch(function() { setMsg('message', 'Error adding book.', 'error'); });
+    });
+
+    document.getElementById('updateBtn').addEventListener('click', function() {
+        var id = document.getElementById('updateId').value.trim();
+        if (!id) { setMsg('updateMessage', 'Book _id is required.', 'error'); return; }
+
+        var updates = {};
+        var title = document.getElementById('updateTitle').value;
+        var year = document.getElementById('updateYear').value;
+        var published = document.getElementById('updatePublished').value;
+
+        if (title) updates.title = title;
+        if (year) updates.year = Number(year);
+        if (published !== '') updates.published = (published === 'true');
+
+        if (Object.keys(updates).length === 0) {
+            setMsg('updateMessage', 'Provide at least one field to update.', 'error');
+            return;
+        }
+
+        fetch('/api/' + id, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updates)
+        })
+        .then(function(res) {
+            if (res.status === 401) { window.location.href = '/login'; return null; }
+            return res.json();
+        })
+        .then(function(data) {
+            if (!data) return;
+            setMsg('updateMessage', 'Book updated!', 'success');
+            document.getElementById('updateId').value = '';
+            document.getElementById('updateTitle').value = '';
+            document.getElementById('updateYear').value = '';
+            document.getElementById('updatePublished').value = '';
+            fetchBooks();
+        })
+        .catch(function() { setMsg('updateMessage', 'Error updating book.', 'error'); });
+    });
+
+    document.getElementById('deleteBtn').addEventListener('click', function() {
+        var id = document.getElementById('deleteId').value.trim();
+        if (!id) { setMsg('deleteMessage', 'Book _id is required.', 'error'); return; }
+
+        fetch('/api/' + id, { method: 'DELETE' })
+        .then(function(res) {
+            if (res.status === 401) { window.location.href = '/login'; return null; }
+            return res.json();
+        })
+        .then(function(data) {
+            if (!data) return;
+            setMsg('deleteMessage', 'Book deleted!', 'success');
+            document.getElementById('deleteId').value = '';
+            fetchBooks();
+        })
+        .catch(function() { setMsg('deleteMessage', 'Error deleting book.', 'error'); });
+    });
+</script>
+</body>
+</html>
